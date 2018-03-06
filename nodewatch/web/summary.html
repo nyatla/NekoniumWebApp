@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script
+    src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <!-- BootstrapのCSS読み込み -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- BootstrapのJS読み込み -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <style>
+        body{
+            padding:30pt;
+        }
+        h2{
+            margin-top: 10pt;
+        }
+        #pub_table {
+            width:100%;
+            border-width: 1px;
+            border-style: solid;
+            border-color:cadetblue;
+        }
+        #pub_table > tbody > tr{
+            padding: 10pt;
+            border-width: 1px;
+            border-style: solid;
+        }
+        #pub_table > tbody > tr:first-child{
+            padding: 10pt;
+            border-color:cadetblue;
+            border-style: solid;
+            border-width: 1px;
+    
+        }
+        #pub_table > tbody > tr >td,th{
+            text-align: left;
+            padding: 5pt;
+            height: 30pt;
+        }
+        #pub_table > tbody > tr >td{
+            font-size: 10pt;
+        }
+        #pub_table > tbody > tr[status="ONLINE"]{
+            background-color:aquamarine;
+        }
+        #pub_table > tbody > tr[status="OFFLINE"]{
+            background-color:darkorange;
+        }
+        #pub_table > tbody > tr[status="NODATA"]{
+            background-color:lightgray;
+        }
+        
+        #pub_table > tbody > tr >td:nth-child(1){
+            width: 20pt;
+        }
+        #pub_table > tbody > tr >td:nth-child(2){
+            width: 120pt;
+        }
+        #pub_table > tbody > tr >td:nth-child(3){
+            width: 60pt;
+        }
+        #pub_table > tbody > tr >td:nth-child(4){
+            width: 100pt;
+        }
+        #pub_table > tbody > tr >td:nth-child(5){
+            font-size: 9pt;
+        }
+        #info_div{
+            text-align:left;
+            margin-top:10pt;
+        }
+    
+        #messsage_p{
+            margin-top:20pt;
+            border: solid 1px #777777;
+            padding: 10pt;
+    
+        }
+    
+        #footer{
+            margin-top:30pt;
+            text-align:right;
+        }
+        
+    </style>
+    <script>
+        //ハッシュ配列を属性文字列に変換
+        function toAttr(i_ha){
+            var r="";
+            for(var k in i_ha){
+                r+=k+"=\""+i_ha[k]+"\"";
+            }
+            return r;
+        }
+        function toTable(i_src,i_param)
+        {
+            var l=i_src["result"]["list"];
+            var r="";
+            for(var i=0;i<l.length;i++){
+                var v=l[i];
+                r+= "<tr status=\""+v["status"]+"\">"+
+                    "<td>"+i+"</td>"+
+                    "<td>"+v["servername"]+"</td>"+
+                    "<td>"+v["status"]+"</td>"+
+                    "<td>"+v["url"]+"</td>"+
+                    "<td>"+v["resultinfo"]+"<br/>"+v["serverinfo"]+"</td>"+
+                    "</tr>";
+            }
+            return  "<table "+toAttr(i_param)+">"+
+                    "<th>NO.</th><th>NAME</th><th>STATUS</th><th>URL</th><th>VERSION</th>"+                    
+                    r+
+                    "</table>";
+        }
+        function toInfo(i_src,i_param){
+            return  "<div "+toAttr(i_param)+">"+
+                    "Last update: "+
+                    new Date(i_src.result.timestamp).toLocaleString()+
+                    "</div>";
+        }
+
+
+        $(function () {
+            //JSONをテーブルにして返すよ。
+            $.getJSON("./app.pubnode-status.php", function(data) {
+                $("#pub_list").html(toTable(data,{id:"pub_table"}));
+                $("#pub_info").html(toInfo(data,{id:"info_div"}));
+            });
+            $.getJSON("./app.rlpx-status.php", function(data) {
+                $("#node_list").html(toTable(data,{id:"pub_table"}));
+                $("#node_info").html(toInfo(data,{id:"info_div"}));
+            });
+        });          
+    </script>
+</head>
+
+<body>
+    <h1>Nekonium nodes state summary</h1>
+    <hr/>
+    <h2>Public node</h2>
+    JSON RPCを利用できるノードです。
+    <div id="pub_info">Timestamp here</div>
+    <div id="pub_list"></div>
+    <h2>Permanent node</h2>
+    接続先ノードです。gnekoniumで接続ができます。
+    <div id="node_info">Timestamp here</div>
+    <div id="node_list"></div>
+    <p id="messsage_p">
+        監視リストにNekoniumのPublic nodeやPermanent nodeを加えるためには<a href="https://discordapp.com/invite/C8mJg44">Discordチャンネル</a>へアクセスしてください。
+    </p>
+    <div id="footer"><a href="https://github.com/nyatla/NekoniumWebApp/tree/master/nodewatch">Github</a>&nbsp;-&nbsp;<a href="https://nekonium.github.io/">Nekonium Project</a></div>
+
+
+</body>
+</html>
