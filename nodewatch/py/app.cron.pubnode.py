@@ -35,10 +35,10 @@ def run(conn):
         web3= Web3(HTTPProvider(i[1]))
         try:
             #登録
-            log.add(i[0],timestamp,web3.version.node,"ONLINE")
+            log.add(i[0],timestamp,"ONLINE",web3.version.node)
             print("ONLINE")
         except IOError as e:
-            log.add(i[0],timestamp,"","OFFLINE")
+            log.add(i[0],timestamp,"OFFLINE","")
             print("OFFLINE")
             continue
     print("Done.")

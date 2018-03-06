@@ -75,7 +75,7 @@ class JsonExportApp
             $r=$pdo->query("select latest from (select id,max(timestamp) as latest from activity_log);");
             $timestamp=$r->fetch()["latest"];
             $r=$pdo->query(
-                "SELECT B.name as servername,B.status AS flag,B.url AS url,A.details AS status,A.status AS resultinfo,B.details AS serverinfo ".
+                "SELECT B.name as servername,B.status AS flag,B.url AS url,A.details AS serverinfo,A.status AS status,B.details AS resultinfo ".
                 "FROM server_ids  AS B ".
                 "LEFT OUTER JOIN (SELECT * FROM activity_log WHERE timestamp=$timestamp) AS A ON A.sid=B.id;");
             $l=$r->fetchAll();
