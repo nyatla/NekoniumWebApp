@@ -19,13 +19,10 @@ import json
 from web3 import Web3, HTTPProvider, IPCProvider
 
 DB_PATH="../db/pubnodelog.db"
-def makeList(conn):
+def makeList(fds,conn):
     print("Start discovery process.")
     timestamp=time.time()*1000  #ms単位の現在時刻
     print("timestamp %d."%timestamp)
-    #idsから有効な行を得る
-    ids=ServerIdsTable(conn)
-    fds=ids.getAll()
     l=[]
     #検索
     for i in fds:
@@ -43,14 +40,16 @@ def makeList(conn):
             continue
     print("Done.")
     return l    
-def run(conn):    
+def run(conn):
+    ids=ServerIdsTable(conn)
     log=ActivityLogTable(conn)
-    for i in makeList(conn,pk):
+    for i in makeList(ids.getAll(),conn):
         log.add(i[0],i[1],i[2],i[3])
 def remote(conn,api_path):
-    ids=requests.get("%s?ids"%(api_path))
+    ids_json=requests.get("%s?c=ids"%(api_path)).json()
+    fds=[(i["id"],i["url"],i["name"],i["status"],i["details"]) for i in ids_json["result"]["list"]]
     l=[]
-    for i in makeList(conn):
+    for i in makeList(fds,conn):
         l.append((i[4],i[2],i[3]))
     d=json.dumps({"payload":{"list":l}})
     r=requests.post("%s?c=push_activity"%(api_path),data=d)
