@@ -61,6 +61,10 @@ def makeList(fds,conn,pk):
                 #不明なパケットタイプ
                 print("I", end="")
                 continue
+            #ip/portの一致チェック
+            ipport=urlparse(i[1])
+            if ipport.hostname!=j["addr"] or ipport.port!=j["port"]:
+                continue
             print("A", end="")
             msg=toMsg(j)
             status="ONLINE"

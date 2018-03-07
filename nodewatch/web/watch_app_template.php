@@ -136,6 +136,9 @@ class JsonExportApp
         $this->checkPermission();
         //[url,status,description]
         $json=json_decode(file_get_contents('php://input'));
+        if(empty($json) || !property_exists($json,"payload") || !property_exists($json->payload,"list")){
+            throw new Exception("Invalid Json.");
+        }
 
         // 接続
         $pdo = new PDO('sqlite:'.$this->dbfile);
