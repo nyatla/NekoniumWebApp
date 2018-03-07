@@ -53,12 +53,20 @@ class JsonExportApp
 {
     private $version;
     private $dbfile;
+    private $permission=["127.0.0.1"];
     function __construct($version="JsonExportApp/1.0",$a_db_file="log.sqlite3")
     {
         $this->version=$version;
         $this->dbfile=$a_db_file;
     }
-
+    function setPermission($permission){
+        $this->permission=$permission;
+    }
+    private function checkPermission(){
+        if(!in_array($_SERVER['REMOTE_ADDR'],$this->permission)){
+            throw new Exception("Permission denied.");
+        }
+    }
     private function makeLatestJson()
     {
         $ret_array=null;
@@ -99,13 +107,91 @@ class JsonExportApp
         }
         $ret_array["created_time"]=$time*1000;
         $ret_array["version"]=$this->version;
-        return json_encode($ret_array,JSON_UNESCAPED_SLASHES | (JSON_NUMERIC_CHECK)|JSON_PRETTY_PRINT);
+        return $ret_array;
+    }
+    private function ids()
+    {
+        $this->checkPermission();
+        $ret_array=null;
+        // 接続
+        $pdo = new PDO('sqlite:'.$this->dbfile);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // デフォルトのフェッチモードを連想配列形式に設定 
+        // (毎回PDO::FETCH_ASSOCを指定する必要が無くなる)
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        #ActivityLogの最新時刻を得る
+        $r=$pdo->query("SELECT * FROM server_ids");
+        $l=$r->fetchAll();
+        unset($pdo);
+        #idをunset
+        $ret_array=array(
+            "success"=>"true",
+            "result"=>array("list"=>$l));
+
+        return $ret_array;
+    }
+    private function push_activity()
+    {
+        $time=time();
+        $this->checkPermission();
+        //[url,status,description]
+        $json=json_decode(file_get_contents('php://input'));
+
+        // 接続
+        $pdo = new PDO('sqlite:'.$this->dbfile);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        //idsテーブルを得る
+        $r=$pdo->query("SELECT * FROM server_ids");
+        $ids=$r->fetchAll();
+        //idごとのステータスを書き込む。無いときは書き込まない。
+        $retnumber=0;
+        foreach($ids as $i){
+            $l=$json->payload->list;
+            foreach($l as $j){
+                if($j[0]!=$i["url"]){
+                    continue;
+                }
+                $stmt = $pdo->prepare("INSERT INTO activity_log (sid,timestamp,status,details) VALUES(?,?,?,?)");
+                $stmt->bindValue(1,$i["id"]);
+                $stmt->bindValue(2,$time*1000);
+                $stmt->bindValue(3,$j[1]);
+                $stmt->bindValue(4,$j[2]);
+                $stmt->execute();
+                $retnumber++;
+                break;
+            }
+        }
+        unset($pdo);
+        #idをunset
+        return array(
+            "success"=>"true",
+            "result"=>array("add"=>($retnumber)."/".count($ids)));
     }
     public function run()
     {
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin:*');
-        print($this->makeLatestJson());
+        $r=null;
+        try {
+            switch(isset($_GET['c'])?$_GET['c']:""){
+            case 'ids':
+                $r=($this->ids());
+                break;
+            case 'push_activity':
+                $r=($this->push_activity());
+                break;            
+            default:
+                $r=($this->makeLatestJson());
+                break;
+            }
+        } catch (Exception $e) {
+            $r=array(
+                "success"=>false,
+                "error"=>$e->__toString()
+            );
+        }
+        print(json_encode($r,JSON_UNESCAPED_SLASHES | (JSON_NUMERIC_CHECK)|JSON_PRETTY_PRINT));
     }
 };
 

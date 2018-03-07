@@ -5,7 +5,7 @@
     コマンド
     add <url> <name> <discription>
         サーバーリストに登録する
-        urlは、"(http|https)://<host>:<port>"
+        urlは、"enode://user@host:port" userは省略可能。
     ids
         サーバーリストの一覧を返す
     log
@@ -22,13 +22,12 @@ from secp256k1 import PrivateKey
 from rlpxdiscover import * 
 from db_activity import * 
 from urllib.parse import urlparse
-
+import requests
+import json
 #CONFIG
 CONFIG_DB_PATH="../db/rlpxd.db"
 
-
-def run(conn,pk):
-
+def makeList(conn,pk):
     print("Start discovery process.")
     timestamp=time.time()*1000  #ms単位の現在時刻
     print("timestamp %d."%timestamp)
@@ -39,7 +38,7 @@ def run(conn,pk):
     #検索
     priv_key = PrivateKey()
     priv_key.deserialize(pk)
-    rlpxd=RLPxDiscovery(priv_key)
+    rlpxd=RLPxDiscovery(priv_key,my_port=22222)
     rlpxd.listen()
     for i in fds:
         if i[3]!=ServerIdsTable.STATUS_ENABLE :
@@ -51,11 +50,9 @@ def run(conn,pk):
     time.sleep(5)
     r=rlpxd.close()
     print("Recrived %d packets."%(len(r)))
-
-
     def toMsg(info):
         return "enode://%s:%d %s"%(info["addr"],info["port"],datetime.fromtimestamp(info["packet"]["payload"].timestamp).strftime("%Y/%m/%d:%H%M%S"))
-    log=ActivityLogTable(conn)
+    ret=[]
     for i in fds:
         if i[3]!=ServerIdsTable.STATUS_ENABLE :
             continue
@@ -72,9 +69,26 @@ def run(conn,pk):
             msg=toMsg(j)
             status="ONLINE"
             break
-        log.add(i[0],timestamp,status,msg)
+        #sid,timestamp,status,description,url
+        ret.append([i[0],timestamp,status,msg,i[1]])
     print()
     print("Done.")
+    return ret
+
+def run(conn,pk):
+    log=ActivityLogTable(conn)
+    for i in makeList(conn,pk):
+        log.add(i[0],i[1],i[2],i[3])
+def remote(conn,pk,api_path):
+    ids=requests.get("%s?ids"%(api_path))
+    l=[]
+    for i in makeList(conn,pk):
+        l.append((i[4],i[2],i[3]))
+    d=json.dumps({"payload":{"list":l}})
+    r=requests.post("%s?c=push_activity"%(api_path),data=d)
+    print(r.text)
+
+
 
 def main():
     a=sys.argv[1]
@@ -84,9 +98,10 @@ def main():
             ids=ServerIdsTable(c)
             url=urlparse(sys.argv[2])
             url=url if url.scheme!="" else urlparse("enode://"+sys.argv[2])
-            port=28568 if (url.port is None) else url.port    
-            print("Add:enode://",url.hostname,":",port)
-            ids.add("enode://%s:%d"%(url.hostname,port),sys.argv[3],details=sys.argv[4])
+            port=28568 if (url.port is None) else url.port
+            full_url="enode://%s%s:%d"%(("" if url.username is None else (url.username+"@")),url.hostname,port)
+            print("Add : ",full_url)
+            ids.add(full_url,sys.argv[3],details=sys.argv[4])
         elif a=="ids":
             ids=ServerIdsTable(c)
             pprint(ids.getAll())
@@ -98,6 +113,11 @@ def main():
             if len(sys.argv)>2:
                 pk=sys.argv[2]
             run(c,pk)
+        elif a=="remote":
+            pk="0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+            if len(sys.argv)>3:
+                pk=sys.argv[3]
+            remote(c,pk,sys.argv[2])
         else:
             raise Exception("Invalid arg[1]")
     finally:
