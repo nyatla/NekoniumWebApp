@@ -5,7 +5,8 @@ NodeWatchはNekoniumのノードを監視するウェブアプリケーション
 
 アプリケーションは、データベースを更新するPythonスクリプトと、データベースの情報をRESTAPIで出力するPHPスクリプトでできています。
 
-
+デモ
+http://nekonium.org/nodewatch/web/summary.html
 
 ## セットアップ
 
