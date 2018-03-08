@@ -189,7 +189,7 @@ class RLPxDiscovery(object):
         self.th_join.set()
         self.th.join()
         self.th=None
-        self.sock.shutdown(socket.SHUT_RDWR )
+        self.sock.close()
         self.sock=None
         return self._response
 
