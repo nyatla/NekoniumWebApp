@@ -1,10 +1,10 @@
-NodeWatch
+# NodeWatch
 
 
 NodeWatchはNekoniumのノードを監視するウェブアプリケーションです。Rlpx(Ethereumの)ノード探索プロトコル、またはJSONRPCを使ってノードの死活状態を監視できます。
 
-アプリケーションは、データベースを作成、更新するPythonスクリプトと、データベースの情報をRESTAPIで出力するPHPスクリプトでできています。
-PythonスクリプトとPHPスクリプトを別のサーバーで動して連携することができます。
+アプリケーションは、データベースを更新するPythonスクリプトと、データベースの情報をRESTAPIで出力するPHPスクリプトでできています。
+
 
 
 ## セットアップ
@@ -25,11 +25,11 @@ web3がsha関連のエラーを出すときは、sha3をuninstallしてくださ
 PHP7位が必要です。
 sslとsqlite3を使います。php.iniを編集して有効化してください。
 
-##使い方
+## 使い方
 
 定期的にサーバ状態を更新するためには、cronなどでrunコマンドを定期実行してください。
 
-###PublicNode
+### PublicNode
 JSONRPCを有効にしたnekoniumノードを監視することができます。結果はdb/pubnodelog.dbに保存します。
 
 監視リストにサーバーを追加
@@ -101,7 +101,7 @@ rlpxdの例
 ~~~~
 $ python3 app.cron.rlpxd.py remote <app.pubnode-status.php RESTAPIのURL>
 ~~~~
-RESTAPIのURLは、たとえばhttp://127.0.0.1/app.pubnode-status.phpを指定します。
+RESTAPIのURLは、"http://127.0.0.1/app.pubnode-status.php" のように指定します。
 接続先のnodewatchのapp.pubnode-status.phpを編集して、次のようにPermissionリストに接続元のIPアドレスを加えてください。
 ~~~~
 $app->setPermission(["127.0.0.1","your ip address"]);
