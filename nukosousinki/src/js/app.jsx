@@ -350,7 +350,7 @@ class AddrForm extends React.Component {
           <li>Action - Sendと表示されているときは押すことができます。</li>
           <li>+ - 行を追加します。</li>
         </ul>
-        <div id="footer"><a href="https://github.com/nyatla/NekoniumWebApp/tree/master/nukosousinki">Github</a>&nbsp;-&nbsp;<a href="https://nekonium.github.io/">Nekonium Project</a></div>
+        <div id="footer"><a  target="_blank" rel="noreferrer noopener" href="https://github.com/nyatla/NekoniumWebApp/tree/master/nukosousinki">Github</a>&nbsp;-&nbsp;<a  target="_blank" rel="noreferrer noopener" href="https://nekonium.github.io/">Nekonium Project</a></div>
       </div>
     );
 
