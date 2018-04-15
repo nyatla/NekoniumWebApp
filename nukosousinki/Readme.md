@@ -17,30 +17,30 @@ webpack/web3/React4の練習用に作ったものですので、品質につい�
 + SetAmountsは、設定値をすべての未送信アイテムに一括設定します。
 + Resetは、アプリケーションを初期状態に戻します。
 + SendAllは送信可能状態にあるすべてのアイテムをSendします。
-
++ 漢字変換が有効だと入力できません！
 
 
 ## Development
 
 nodeJS,Webpack4,React4,Less,Web3を使います。npmで適切にセットアップしておいてください。
 
-deploy
+### deploy
 ```
-npm run wepback
+npm run build
 ```
 
 debug
 ```
-npm run wepback
+npm run webpack-dev-server
 ```
 Open http;//localhost:3000 with your browser.
 
 
 
-##ライセンス
+## ライセンス
 
 MITライセンスとします。
 
-デモ
-http://nekonium.org/nodewatch/web/summary.html
+### デモ
+http://nekonium.org/nukosousinki/index.html
 

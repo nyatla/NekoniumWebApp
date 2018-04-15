@@ -95,7 +95,7 @@ class AddrInput extends React.Component {
   }
   render() {
     return (
-      <input type="text" value={this.state.value} disabled={this.state.fix} onChange={this.onChange} />
+      <input type="text" placeholder="eg. 0x0000000000000000000000000000000000000000" value={this.state.value} disabled={this.state.fix} onChange={this.onChange} />
     );
   }
 }
@@ -142,7 +142,7 @@ class AmountInput extends React.Component {
   }
   render() {
     return (
-      <input type="text" value={this.state.value} disabled={this.state.fix} onChange={this.onChange} />
+      <input type="text" placeholder="eg. 0.1" value={this.state.value} disabled={this.state.fix} onChange={this.onChange} />
     );
   }
 }

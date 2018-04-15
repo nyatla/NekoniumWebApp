@@ -4,19 +4,17 @@ const path = require('path');
 var webpack = require("webpack");
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const app = {
-    // モードの設定、v4系以降はmodeを指定しないと、webpack実行時に警告が出る
-    mode: 'development',
+
+const app={
+    mode:"production",
     // エントリーポイントの設定
     entry: [
         path.resolve(__dirname,'./src/js/app.jsx'),
-        'webpack-dev-server/client?http://localhost:3000',
-        'webpack/hot/only-dev-server'
     //    ,'react-hot-loader/patch'
     ],
     // 出力の設定
     output: {
-        filename: 'app.jsx',
+        filename: 'app.js',
         path: path.join(__dirname, 'public'),
         publicPath: '/'
     },
@@ -36,24 +34,11 @@ const app = {
     resolve: {
         extensions: ['.js', '.jsx'],
     },
-    plugins: [
+    plugins:[
         new CopyWebpackPlugin([
             { from: __dirname+'/src/index.html', to: "index.html" },
-            //      { from: './app/images', to: "images" },
-        ]),
-        //    new ExtractTextPlugin('style.css'),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoEmitOnErrorsPlugin(),  // don't reload if there is an error    
-    ],
+        ])
+    ]
+}
 
-    // webpack-dev-server向け設定
-    devServer: {
-        hot: true,
-        inline: true,
-        historyApiFallback: true,
-        port: 3000,
-        headers: { 'Access-Control-Allow-Origin': '*' } // 必要があれば設定する
-    },
-    devtool: "source-map"
-};
-module.exports=[app];
+module.exports=app;
