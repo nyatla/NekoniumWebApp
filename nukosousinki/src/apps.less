@@ -1,0 +1,118 @@
+body { 
+    padding-top: 10px;
+    font-size:12pt;
+}
+
+.AddrForm {
+    .table{
+        display:table;
+        div{
+            border: none;
+            display:table-row;
+            div{
+                display:table-cell;
+            }   
+            div:nth-child(1){
+                min-width:430px;
+                width:430px;
+            }
+            div:nth-child(2){
+                min-width:100px;
+                width:100px;
+                text-align:center;
+            }
+            div:nth-child(3){
+                min-width:100px;
+                text-align:center;
+            }            
+        }
+    }
+    >div:nth-child(1){
+        display:table;
+        >div{
+            display:table-row;
+            >div{
+                display:table-cell;
+                >button,input{
+                    border-style:solid;
+                    border-width:1px;
+                    width:100px;
+                    margin:3px;
+                }        
+                >button{
+                    height:30px;
+                    border-radius: 3px;                
+                }
+                >input{
+                    font-size:12pt;
+                    height:28px;
+                    text-align:right;
+                    padding: 0 2px;
+                }
+                >span{
+                    vertical-align: bottom;
+                    font-size:9pt;
+                }
+            }
+        }
+    }
+    >div:nth-child(2){
+        .table;
+        font-size: 9pt;
+        background-color:burlywood;
+        margin-bottom:5px;
+    }
+    >div:nth-child(n+3){
+        >div:nth-child(1){
+            .table;
+            input{
+                font-size:12pt;
+            }
+            >div>div:nth-child(1)>input{
+                width:420px;
+            }
+            >div>div:nth-child(2)>input{
+                width:80px;
+            }
+
+            button,input{
+                vertical-align : top;
+                width:100%;
+                margin:0;
+                padding:0;
+            }
+            input{
+                height:28px;
+                border-style:solid;
+                border-width:1px;
+            }
+            button{
+                height:30px;
+                border-radius: 3px;
+                border-style:solid;
+                border-width:1px;
+            }
+
+        }
+        >div:nth-child(2){
+            font-size:9pt;
+        }
+    padding-bottom:5px;
+        
+    }
+    >button{
+        border-radius: 3px;
+        width:60px;
+        height:40px;
+        border-style:solid;
+        border-width:1px;
+    }
+    >ul{
+        border-style:solid;
+        border-width:1px;
+        border-color:cadetblue;
+        font-size:9pt;
+    }  
+
+
+}
